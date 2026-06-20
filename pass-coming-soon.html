@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pass by Highly — Yak&#305;nda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --yellow: #FAD94F;
+    --yellow-dim: #F5C800;
+    --purple: #5B1DB8;
+    --purple-light: #7C3AED;
+    --purple-deep: #3B0D8A;
+    --white: #FFFFFF;
+    --text-on-yellow: #3B0D8A;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--yellow);
+    color: var(--text-on-yellow);
+    overflow-x: hidden;
+  }
+
+  /* ── AMBIENT BG BLOBS ── */
+  .bg-blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-1 {
+    width: 500px; height: 500px;
+    background: var(--purple);
+    top: -150px; right: -100px;
+    animation: drift 12s ease-in-out infinite alternate;
+  }
+  .blob-2 {
+    width: 350px; height: 350px;
+    background: var(--purple-deep);
+    bottom: -80px; left: -80px;
+    animation: drift 16s ease-in-out infinite alternate-reverse;
+  }
+  @keyframes drift {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(30px, 20px) scale(1.08); }
+  }
+
+  /* ── LAYOUT ── */
+  .page {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px 60px;
+    text-align: center;
+  }
+
+  /* ── LOGO ── */
+  .logo-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(52px, 10vw, 96px);
+    color: var(--purple);
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+  .logo-star {
+    font-size: clamp(44px, 8vw, 80px);
+    color: var(--purple);
+    line-height: 1;
+    animation: pulse-star 3s ease-in-out infinite;
+  }
+  @keyframes pulse-star {
+    0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    50%       { transform: scale(1.15) rotate(15deg); opacity: 0.85; }
+  }
+  .logo-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: lowercase;
+    color: var(--purple);
+    opacity: 0.75;
+    margin-bottom: 56px;
+  }
+
+  /* ── HEADLINE ── */
+  .headline {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(28px, 6vw, 56px);
+    color: var(--purple);
+    line-height: 1.15;
+    max-width: 700px;
+    margin-bottom: 20px;
+  }
+  .headline span {
+    display: inline-block;
+    background: var(--purple);
+    color: var(--yellow);
+    padding: 2px 14px 4px;
+    border-radius: 8px;
+    font-style: italic;
+  }
+
+  .desc {
+    font-size: clamp(15px, 2.5vw, 18px);
+    color: var(--purple);
+    opacity: 0.8;
+    max-width: 520px;
+    line-height: 1.7;
+    margin-bottom: 52px;
+  }
+
+  /* ── PILL TAGS ── */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 60px;
+  }
+  .tag {
+    background: var(--purple);
+    color: var(--yellow);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 8px 18px;
+    border-radius: 100px;
+  }
+
+  /* ── NOTIFY FORM ── */
+  .notify-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--purple);
+    opacity: 0.6;
+    margin-bottom: 16px;
+  }
+  .notify-form {
+    display: flex;
+    gap: 0;
+    max-width: 440px;
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(91,29,184,0.22);
+    margin-bottom: 16px;
+  }
+  .notify-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: var(--white);
+    color: var(--purple-deep);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 16px 20px;
+  }
+  .notify-input::placeholder { color: #A89DC8; }
+  .notify-btn {
+    background: var(--purple);
+    color: var(--yellow);
+    border: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 16px 24px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .notify-btn:hover { background: var(--purple-deep); }
+  .notify-hint {
+    font-size: 12px;
+    color: var(--purple);
+    opacity: 0.5;
+  }
+
+  /* ── SUCCESS STATE ── */
+  .success-msg {
+    display: none;
+    background: var(--purple);
+    color: var(--yellow);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 16px 28px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+    animation: pop-in 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes pop-in {
+    from { transform: scale(0.8); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 48px;
+    height: 3px;
+    background: var(--purple);
+    opacity: 0.2;
+    border-radius: 2px;
+    margin: 52px auto 40px;
+  }
+
+  /* ── FEATURES GRID ── */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    max-width: 820px;
+    width: 100%;
+    margin-bottom: 64px;
+  }
+  .feature-card {
+    background: rgba(91,29,184,0.08);
+    border: 1.5px solid rgba(91,29,184,0.12);
+    border-radius: 20px;
+    padding: 28px 24px;
+    text-align: left;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .feature-card:hover {
+    transform: translateY(-3px);
+    background: rgba(91,29,184,0.13);
+  }
+  .feature-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .feature-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--purple);
+    margin-bottom: 6px;
+  }
+  .feature-desc {
+    font-size: 13px;
+    color: var(--purple);
+    opacity: 0.7;
+    line-height: 1.55;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    font-size: 12px;
+    color: var(--purple);
+    opacity: 0.45;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  footer .star-sm { font-size: 10px; }
+
+  /* ── FLOATING STAR DECORATIONS ── */
+  .deco-star {
+    position: fixed;
+    color: var(--purple);
+    opacity: 0.07;
+    pointer-events: none;
+    font-size: 60px;
+    animation: slow-spin 20s linear infinite;
+  }
+  .deco-star:nth-child(1) { top: 8%; left: 6%; font-size: 40px; animation-duration: 14s; }
+  .deco-star:nth-child(2) { top: 15%; right: 10%; font-size: 80px; animation-duration: 22s; animation-direction: reverse; }
+  .deco-star:nth-child(3) { bottom: 18%; right: 7%; font-size: 50px; animation-duration: 18s; }
+  .deco-star:nth-child(4) { bottom: 10%; left: 12%; font-size: 30px; animation-duration: 12s; animation-direction: reverse; }
+  @keyframes slow-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 520px) {
+    .notify-form { flex-direction: column; border-radius: 14px; }
+    .notify-input { border-radius: 14px 14px 0 0; }
+    .notify-btn { border-radius: 0 0 14px 14px; padding: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Deco stars -->
+<div class="deco-star">✦</div>
+<div class="deco-star">✦</div>
+<div class="deco-star">✦</div>
+<div class="deco-star">✦</div>
+
+<!-- Bg blobs -->
+<div class="bg-blob blob-1"></div>
+<div class="bg-blob blob-2"></div>
+
+<main class="page">
+
+  <!-- Logo -->
+  <div class="logo-wrap">
+    <span class="logo-text">Pass</span>
+    <span class="logo-star">✦</span>
+  </div>
+  <p class="logo-sub">by highly</p>
+
+  <!-- Headline -->
+  <h1 class="headline">
+    &#304;ndirim, &ouml;d&uuml;l ve avantaj —<br>
+    <span>tamamen bedava.</span>
+  </h1>
+  <p class="desc">
+    Pass by Highly k&#305;sa s&uuml;rede sizinle. Favori markalar&#305;n&#305;zdan &uuml;cretsiz indirimler kazan, her g&uuml;n bedava &uuml;r&uuml;n &ccedil;ekili&#351;ine kat&#305;l&#305;n — abonelik yok, kredi kart&#305; yok.
+  </p>
+
+  <!-- Tags -->
+  <div class="tags">
+    <span class="tag">✦ &Uuml;cretsiz</span>
+    <span class="tag">☕ G&uuml;nl&uuml;k &Ouml;d&uuml;ller</span>
+    <span class="tag">🎰 G&uuml;nl&uuml;k &Ccedil;ark</span>
+    <span class="tag">🏷️ Anla&#351;mal&#305; Markalar</span>
+    <span class="tag">📣 Sadece Reklamlarla D&ouml;n&uuml;yor</span>
+  </div>
+
+  <!-- Notify form -->
+  <p class="notify-label">&#304;lk Sen Ha­ber­dar Ol</p>
+  <div class="notify-form" id="notifyForm">
+    <input class="notify-input" id="emailInput" type="email" placeholder="e-posta adresiniz">
+    <button class="notify-btn" onclick="submitEmail()">Beni Bildir ✦</button>
+  </div>
+  <div class="success-msg" id="successMsg">✦ Listeye eklendiniz! Yak&#305;nda g&ouml;r&uuml;&#351;&uuml;r&uuml;z.</div>
+  <p class="notify-hint">Spam yok. Sadece lansman haberi.</p>
+
+  <div class="divider"></div>
+
+  <!-- Features -->
+  <div class="features">
+    <div class="feature-card">
+      <span class="feature-icon">🏷️</span>
+      <div class="feature-title">Anla&scedil;mal&imath; Markalar</div>
+      <div class="feature-desc">Yerel kafelerden global zincirlere &uuml;cretsiz kuponlar s&uuml;rekli g&uuml;ncelleniyor.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🎰</span>
+      <div class="feature-title">G&uuml;nl&uuml;k &Ccedil;ark</div>
+      <div class="feature-desc">Her g&uuml;n d&ouml;nd&uuml;r, Starbucks'tan Trendyol'a bedava &uuml;r&uuml;n kodu kazan.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🧠</span>
+      <div class="feature-title">Canl&imath; Yar&imath;&scedil;malar</div>
+      <div class="feature-desc">Anlık bilgi yar&#305;&#351;malar&#305;na gir, di&igrave;er kullan&#305;c&#305;lar&#305; ge&ccedil; ve ekstra &ouml;d&uuml;l kazan.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔥</span>
+      <div class="feature-title">FOMO Ak&imath;&scedil;&imath;</div>
+      <div class="feature-desc">&Ouml;d&uuml;l kazananlar ger&ccedil;ek zamanl&imath; listeleniyor — sen de kacirma korkusunu hisset.</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <span class="star-sm">✦</span>
+    Pass by Highly &copy; 2025 &mdash; Bir Highly &uuml;r&uuml;n&uuml;d&uuml;r.
+    <span class="star-sm">✦</span>
+  </footer>
+
+</main>
+
+<script>
+  function submitEmail() {
+    const input = document.getElementById('emailInput');
+    const form  = document.getElementById('notifyForm');
+    const msg   = document.getElementById('successMsg');
+    const email = input.value.trim();
+    if (!email || !email.includes('@')) {
+      input.style.outline = '2px solid #5B1DB8';
+      setTimeout(() => input.style.outline = '', 1200);
+      return;
+    }
+    form.style.display = 'none';
+    msg.style.display  = 'block';
+    // localStorage'a kaydet (basit)
+    const list = JSON.parse(localStorage.getItem('pass_waitlist') || '[]');
+    if (!list.includes(email)) { list.push(email); localStorage.setItem('pass_waitlist', JSON.stringify(list)); }
+  }
+  document.getElementById('emailInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') submitEmail();
+  });
+</script>
+</body>
+</html>
